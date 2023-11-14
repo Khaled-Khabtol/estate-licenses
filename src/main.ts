@@ -16,6 +16,8 @@ async function bootstrap() {
     prefix: '/images',
   });
 
+  app.enableCors();
+
   const port = app.get(ConfigService).get<number>('PORT');
   await app.listen(port);
 }

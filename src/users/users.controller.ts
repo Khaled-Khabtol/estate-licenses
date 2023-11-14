@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto/create-user.dto';
@@ -16,8 +16,8 @@ export class UsersController {
     @Roles('admin')
     @UseGuards(JwtAuthGuard, RoleGuard)
     @Get()
-    async findAll(): Promise<User[]> {
-        return this.usersService.findAll();
+    async findAll(@Query('page') page: number, @Query('limit') limit: number): Promise<User[]> {
+        return this.usersService.findAll(page, limit);
     }
 
     @Roles('admin')

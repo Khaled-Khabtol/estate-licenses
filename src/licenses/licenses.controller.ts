@@ -18,8 +18,8 @@ export class LicensesController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    findAll() {
-        return this.licensesService.findAll();
+    findAll(@Query('page') page: number, @Query('limit') limit: number) {
+        return this.licensesService.findAll(page, limit);
     }
 
     @Get(':id')

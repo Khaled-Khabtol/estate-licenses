@@ -24,8 +24,8 @@ export class UsersService {
         return { token, user };
     }
 
-    async findAll(): Promise<User[]> {
-        const users = await this.userRepo.find();
+    async findAll(page: number, limit: number): Promise<User[]> {
+        const users = await this.findWithPagination(page, limit);
         users.map((user) => delete user.password);
         return users;
     }
@@ -71,6 +71,15 @@ export class UsersService {
 
         delete updateUser.password;
         return this.userRepo.save(updateUser);
+    }
+
+    async findWithPagination(page: number = 1, limit: number = 10): Promise<User[]> {
+        const skip = (page - 1) * limit;
+
+        return await this.userRepo.find({
+            skip,
+            take: limit,
+        });
     }
 
 }

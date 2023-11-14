@@ -14,8 +14,8 @@ export class LicensesService {
     constructor(@InjectRepository(License) private readonly licensesRep: Repository<License>,
         private readonly configService: ConfigService, private readonly qrCodeService: QrCodeService) { }
 
-    async findAll(): Promise<License[]> {
-        return this.licensesRep.find();
+    async findAll(page: number, limit: number): Promise<License[]> {
+        return this.findWithPagination(page, limit);
     }
 
     async findOne(id: number): Promise<License> {
@@ -74,6 +74,15 @@ export class LicensesService {
             console.error(`Error deleting file ${filename}:`, error.message);
             throw new Error(`Error deleting file ${filename}`);
         }
+    }
+
+    async findWithPagination(page: number = 1, limit: number = 10): Promise<License[]> {
+        const skip = (page - 1) * limit;
+
+        return await this.licensesRep.find({
+            skip,
+            take: limit,
+        });
     }
 
 }

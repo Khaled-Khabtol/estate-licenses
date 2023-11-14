@@ -4,14 +4,15 @@ import { License } from './entities/licenses.entity';
 import { Repository } from 'typeorm';
 import { CreateLicenseDto } from './dto/create-license.dto/create-license.dto';
 import { UpdateLicenseDto } from './dto/update-license.dto/update-license.dto';
-// import { QrCodeService } from 'src/qrcode/qr-code.service';
+import { QrCodeService } from 'src/qrcode/qr-code.service';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs/promises';
 
 @Injectable()
 export class LicensesService {
 
     constructor(@InjectRepository(License) private readonly licensesRep: Repository<License>,
- private readonly configService: ConfigService) { } //private readonly qrCodeService: QrCodeService
+        private readonly configService: ConfigService, private readonly qrCodeService: QrCodeService) { }
 
     async findAll(): Promise<License[]> {
         return this.licensesRep.find();
@@ -36,10 +37,10 @@ export class LicensesService {
         const HOST_IP = this.configService.get<string>('HOST_IP');
 
         const newLicense = await this.licensesRep.save(license);
-        // const outputPath = `images/${newLicense.id}_qrcode.png`;
-        // const imageUrl = await this.qrCodeService.generateQrCode(`${HOST_IP}/images/${newLicense.id}`, outputPath);
+        const outputPath = `images/${newLicense.id}_qrcode.png`;
+        const imageUrl = await this.qrCodeService.generateQrCode(`${HOST_IP}/images/${newLicense.id}`, outputPath);
 
-        // newLicense.qrcode_url = `${HOST_IP}/${imageUrl}`;
+        newLicense.qrcode_url = `${HOST_IP}/${imageUrl}`;
         return this.licensesRep.save(newLicense);
     }
 
@@ -61,7 +62,18 @@ export class LicensesService {
         if (deleteLicense.affected === 0)
             throw new NotFoundException(`License with id ${id} doesn't exists`);
 
+        this.deleteFile(`${id}_qrcode.png`);
         return { "message": `License with id ${id} Deleted Successfully` };
+    }
+
+    async deleteFile(filename: string) {
+        try {
+            const filePath = `images/${filename}`;
+            await fs.unlink(filePath);
+        } catch (error) {
+            console.error(`Error deleting file ${filename}:`, error.message);
+            throw new Error(`Error deleting file ${filename}`);
+        }
     }
 
 }

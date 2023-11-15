@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
@@ -24,10 +24,11 @@ export class UsersService {
         return { token, user };
     }
 
-    async findAll(page: number, limit: number): Promise<User[]> {
+    async findAll(page: number, limit: number) {
+        const usersCount = await this.userRepo.count();
         const users = await this.findWithPagination(page, limit);
         users.map((user) => delete user.password);
-        return users;
+        return { users, page, usersCount };
     }
 
     async create(user: Partial<User>): Promise<User> {
@@ -53,6 +54,8 @@ export class UsersService {
     }
 
     async remove(id: string) {
+        if (+id === 1)
+            throw new ForbiddenException('The admin cannot be deleted');
         const deleteUser = await this.userRepo.delete(id);
         if (deleteUser.affected === 0)
             throw new NotFoundException(`User with id ${id} doesn't exists`);
@@ -73,7 +76,7 @@ export class UsersService {
         return this.userRepo.save(updateUser);
     }
 
-    async findWithPagination(page: number = 1, limit: number = 10): Promise<User[]> {
+    async findWithPagination(page: number = 1, limit: number = 9): Promise<User[]> {
         const skip = (page - 1) * limit;
 
         return await this.userRepo.find({

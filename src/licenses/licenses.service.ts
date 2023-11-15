@@ -14,8 +14,10 @@ export class LicensesService {
     constructor(@InjectRepository(License) private readonly licensesRep: Repository<License>,
         private readonly configService: ConfigService, private readonly qrCodeService: QrCodeService) { }
 
-    async findAll(page: number, limit: number): Promise<License[]> {
-        return this.findWithPagination(page, limit);
+    async findAll(page: number, limit: number) {
+        const licensesCount = await this.licensesRep.count();
+        const licenses = await this.findWithPagination(page, limit);
+        return { licenses, page, licensesCount };
     }
 
     async findOne(id: number): Promise<License> {
@@ -38,7 +40,7 @@ export class LicensesService {
 
         const newLicense = await this.licensesRep.save(license);
         const outputPath = `images/${newLicense.id}_qrcode.png`;
-        const imageUrl = await this.qrCodeService.generateQrCode(`${HOST_IP}/images/${newLicense.id}`, outputPath);
+        const imageUrl = await this.qrCodeService.generateQrCode(`${HOST_IP}/licenses/${newLicense.id}`, outputPath);
 
         newLicense.qrcode_url = `${HOST_IP}/${imageUrl}`;
         return this.licensesRep.save(newLicense);
@@ -76,7 +78,7 @@ export class LicensesService {
         }
     }
 
-    async findWithPagination(page: number = 1, limit: number = 10): Promise<License[]> {
+    async findWithPagination(page: number = 1, limit: number = 9): Promise<License[]> {
         const skip = (page - 1) * limit;
 
         return await this.licensesRep.find({

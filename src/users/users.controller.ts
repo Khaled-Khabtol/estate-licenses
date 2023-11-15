@@ -16,7 +16,7 @@ export class UsersController {
     @Roles('admin')
     @UseGuards(JwtAuthGuard, RoleGuard)
     @Get()
-    async findAll(@Query('page') page: number, @Query('limit') limit: number): Promise<User[]> {
+    async findAll(@Query('page') page: number, @Query('limit') limit: number) {
         return this.usersService.findAll(page, limit);
     }
 

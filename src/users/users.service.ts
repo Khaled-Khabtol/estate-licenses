@@ -72,6 +72,13 @@ export class UsersService {
         if (!updateUser)
             throw new NotFoundException(`User with id ${id} doesn't exists`);
 
+        if (dto?.email) {
+            const existUser = await this.userRepo.findOne({ where: { "email": dto.email } });
+
+            if (existUser && existUser.id !== +id)
+                throw new ConflictException(`User with email ${dto.email} already exists`);
+        }
+
         delete updateUser.password;
         return this.userRepo.save(updateUser);
     }

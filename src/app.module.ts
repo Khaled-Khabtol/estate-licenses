@@ -13,10 +13,10 @@ import { ConfigModule } from '@nestjs/config';
   imports: [LicensesModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: 'postgres://postgres:123456789@localhost:5432/estate-licenses',
+      type: 'mysql',
+      url: 'mysql://root:123456789@localhost:3306/estate_licenses',
       autoLoadEntities: true,
-      synchronize: false,  // todo: set false when push to production
+      synchronize: true,  // todo: set false when push to production
     }),
     PassportModule,
     JwtModule.register({ secret: 'trszhq!@$#%^*&()weqzaq', signOptions: { expiresIn: '4h' } }),

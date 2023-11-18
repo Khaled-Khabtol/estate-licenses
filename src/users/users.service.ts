@@ -1,14 +1,44 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
 import { UpdateUserDto } from './dto/update-user.dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnApplicationBootstrap {
 
-    constructor(@InjectRepository(User) public userRepo: Repository<User>) { }
+    private readonly logger = new Logger(UsersService.name);
+
+    constructor(@InjectRepository(User) public userRepo: Repository<User>,
+        private readonly configService: ConfigService) { }
+
+    async onApplicationBootstrap() {
+        const email = this.configService.get<string>('ROOT_EMAIL');
+        const password = this.configService.get<string>('ROOT_PASSWORD');
+        const user_name = this.configService.get<string>('ROOT_USERNAME');
+
+        const rootUser = {
+            "id": 1,
+            "user_name": user_name,
+            "email": email,
+            "password": password,
+            "role": "admin"
+        }
+
+        const user = await this.userRepo.findOne({
+            where: { "id": 1 }
+        });
+
+        if (!user) {
+            const newUser = this.userRepo.create(rootUser);
+            this.userRepo.save(newUser);
+            this.logger.log(`user root with email ${newUser.email} added successfully`);
+        }
+        else
+            this.logger.log('user root is already exists');
+    }
 
     async login(email: string, password: string) {
         const user = await this.userRepo.findOne({ where: { "email": email } });

@@ -7,7 +7,7 @@ export class License {
     id: number;
 
     //@Column('json', { nullable: true })
-    @Column('jsonb')
+    @Column('json')
     main_data: {
         license_number_secretariat: string;
         license_number: string;
@@ -24,7 +24,7 @@ export class License {
         building_description: string;
     };
 
-    @Column('jsonb')
+    @Column('json')
     applicant_data: {
         applicant_characteristics: string;
         applicant_id: string;
@@ -33,7 +33,7 @@ export class License {
         email: string;
     };
 
-    @Column('jsonb')
+    @Column('json')
     ownershipData: {
         ownership_type: string;
         ownership_number: string;
@@ -42,13 +42,13 @@ export class License {
         plot_number: string;
     };
 
-    @Column('jsonb')
+    @Column('json')
     surveyDecisionData: {
         survey_decision_number: string;
         survey_decision_date: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     geolocationData: {
         honesty: string;
         municipal: string;
@@ -57,26 +57,26 @@ export class License {
         block_number: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     midpointCoordinates: {
         abscissa: string;
         y_coordinate: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     contractingData: {
         supervising_engineering_office: string;
         designer_engineering_office: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     ownerData: {
         index: number;
         owner_name: string;
         id_number: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     landData: {
         index: number;
         piece_number: string;
@@ -84,7 +84,7 @@ export class License {
         land_area_plan: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     buildingComponents: {
         building_component: string;
         component_usage: string;
@@ -94,19 +94,19 @@ export class License {
         units_number: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     coordinates: {
         coordinate_number: string;
         abscissa: string;
         y_coordinate: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     pledges: {
         pledge: string;
     }
 
-    @Column('jsonb')
+    @Column('json')
     dimensions_boundaries: {
         instrument_limit: {
             north_instrument_limit: string;

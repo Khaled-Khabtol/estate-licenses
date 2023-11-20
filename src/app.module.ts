@@ -8,15 +8,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseConfigService } from './config/database.service';
 
 @Module({
   imports: [LicensesModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      url: 'mysql://root:123456789@localhost:3306/estate_licenses',
-      autoLoadEntities: true,
-      synchronize: true,  // todo: set false when push to production
+    TypeOrmModule.forRootAsync({
+      useClass: DatabaseConfigService,
     }),
     PassportModule,
     JwtModule.register({ secret: 'trszhq!@$#%^*&()weqzaq', signOptions: { expiresIn: '4h' } }),
